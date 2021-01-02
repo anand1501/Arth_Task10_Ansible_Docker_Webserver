@@ -1,0 +1,45 @@
+ - name: install docker software
+    command: "yum install docker-ce --nobest -y"
+
+  - name: start docker service
+    service:
+      name: "docker"
+      state: started
+      enabled: yes
+
+  - name: install software of python36
+    package:
+      name: python36
+      state: present
+
+  - name: install docker python library
+    pip:
+      name: docker-py
+
+  - name: pull image for docker
+    docker_image:
+      name: httpd
+      source: pull
+
+  - name: Creating webpage directory in MN
+    file:
+      path: "/webpage"
+      state: directory
+
+  - name: Copying html code to  web page directory
+    copy:
+      content: Welcome to my Webserver..!!
+      dest: "/webpage/index.html"
+
+
+  - name: run docker container
+    docker_container:
+      name: myos1
+      image: httpd
+      state: started
+      exposed_ports:
+      - "80"
+      ports:
+      - "8080:80"
+      volumes:
+      - "/webpage/:/usr/local/apache2/htdocs"
